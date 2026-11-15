@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/history_widget.h"
 
+#include "ayu/ui/glass/glass_effect.h"
+
 #include "api/api_compose_with_ai.h"
 #include "api/api_editing.h"
 #include "api/api_bot.h"
@@ -349,7 +351,7 @@ HistoryWidget::HistoryWidget(
 , _forwardPanel(std::make_unique<ForwardPanel>([=] { updateField(); }))
 , _field(
 	this,
-	st::historyComposeField,
+	AyuGlass::ComposeFieldStyle(),
 	Ui::InputField::Mode::MultiLine,
 	tr::lng_message_ph())
 , _richDraftPreview(std::make_unique<HistoryView::Controls::RichDraftPreview>(
@@ -598,7 +600,7 @@ HistoryWidget::HistoryWidget(
 		showPremiumToast(document);
 		return false;
 	});
-	InitMessageFieldFade(_field, st::historyComposeField.textBg);
+	InitMessageFieldFade(_field, AyuGlass::ComposeFieldFadeBg());
 
 	setupFastButtonMode();
 	initAiButton();
@@ -11347,7 +11349,37 @@ void HistoryWidget::drawField(Painter &p, const QRect &rect) {
 	}
 	p.setInactive(
 		controller()->isGifPausedAtLeastFor(Window::GifPauseReason::Any));
-	p.fillRect(myrtlrect(0, backy, width(), backh), st::historyReplyBg);
+	const auto backRect = myrtlrect(0, backy, width(), backh);
+	if (AyuGlass::Enabled()) {
+		const auto theme = controller()->currentChatTheme();
+		if (AyuGlass::FloatingInput()) {
+			const auto inset = AyuGlass::CapsuleInset();
+			const auto capsule = backRect.marginsRemoved(
+				{ inset, inset / 2, inset, inset });
+			AyuGlass::PaintChatGlass(
+				p,
+				capsule,
+				controller(),
+				theme,
+				this,
+				capsule.topLeft(),
+				{
+					.radius = AyuGlass::CapsuleRadius(capsule.height()),
+					.border = true,
+					.topHighlight = false,
+				});
+		} else {
+			AyuGlass::PaintChatGlass(
+				p,
+				backRect,
+				controller(),
+				theme,
+				this,
+				backRect.topLeft());
+		}
+	} else {
+		p.fillRect(backRect, st::historyReplyBg);
+	}
 
 	const auto media = (!_previewDrawPreview && drawMsgText)
 		? drawMsgText->media()

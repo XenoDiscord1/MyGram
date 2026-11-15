@@ -185,6 +185,67 @@ void BuildAvatarCorners(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 	builder.addSkip();
 }
 
+void BuildGlass(SectionBuilder &builder, AyuSectionBuilder &ayu) {
+	auto *settings = &AyuSettings::getInstance();
+
+	builder.addSubsectionTitle(rpl::single(u"Стекло (Liquid Glass)"_q));
+
+	ayu.addSettingToggle({
+		.id = u"ayu/glassEnabled"_q,
+		.title = rpl::single(u"Эффект стекла"_q),
+		.getter = &AyuSettings::glassEnabled,
+		.setter = &AyuSettings::setGlassEnabled,
+		.keywords = { u"glass"_q, u"blur"_q, u"стекло"_q, u"размытие"_q },
+	});
+	ayu.addSettingToggle({
+		.id = u"ayu/glassFloatingInput"_q,
+		.title = rpl::single(u"Плавающее поле ввода"_q),
+		.getter = &AyuSettings::glassFloatingInput,
+		.setter = &AyuSettings::setGlassFloatingInput,
+		.shown = settings->glassEnabledValue(),
+	});
+
+	ayu.addSlider({
+		.id = u"ayu/glassBlur"_q,
+		.title = rpl::single(u"Сила размытия"_q),
+		.steps = 10,
+		.current = settings->glassBlur() - 1,
+		.indexToValue = [](int index) { return index + 1; },
+		.onChanged = [=](int index) {
+			AyuSettings::getInstance().setGlassBlur(index + 1);
+		},
+		.onFinalChanged = [=](int index) {
+			AyuSettings::getInstance().setGlassBlur(index + 1);
+		},
+		.formatLabel = [](int index) {
+			return QString::number(index + 1);
+		},
+	});
+
+	ayu.addSlider({
+		.id = u"ayu/glassOpacity"_q,
+		.title = rpl::single(u"Плотность стекла"_q),
+		.steps = 21,
+		.current = settings->glassOpacity() / 5,
+		.indexToValue = [](int index) { return index * 5; },
+		.onChanged = [=](int index) {
+			AyuSettings::getInstance().setGlassOpacity(index * 5);
+		},
+		.onFinalChanged = [=](int index) {
+			AyuSettings::getInstance().setGlassOpacity(index * 5);
+		},
+		.formatLabel = [](int index) {
+			return QString::number(index * 5) + '%';
+		},
+	});
+
+	builder.addSkip();
+	builder.addDividerText(rpl::single(u"Шапка чата и поле ввода становятся "
+		"матовым стеклом поверх обоев. Чем меньше плотность, "
+		"тем прозрачнее стекло."_q));
+	builder.addSkip();
+}
+
 void BuildAppearance(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 	auto *settings = &AyuSettings::getInstance();
 
@@ -385,6 +446,7 @@ const auto kMeta = BuildHelper({
 	builder.addSkip();
 	BuildAppIcon(builder, ayu);
 	BuildAvatarCorners(builder, ayu);
+	BuildGlass(builder, ayu);
 	BuildAppearance(builder, ayu);
 	BuildChatFolders(builder, ayu);
 	BuildTrayElements(builder, ayu);

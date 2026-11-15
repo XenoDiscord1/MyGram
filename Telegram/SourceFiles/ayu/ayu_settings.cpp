@@ -518,6 +518,8 @@ void AyuSettings::validate() {
 	validateRange(_messageBubbleRadius, 0, 16, defaults._messageBubbleRadius);
 	validateRange(_wideMultiplier, 0.5, 4.0, defaults._wideMultiplier);
 	validateRange(_avatarCorners, 0, AyuUiSettings::kMaxAvatarCorners, defaults._avatarCorners);
+	validateRange(_glassBlur, 1, 10, defaults._glassBlur);
+	validateRange(_glassOpacity, 0, 100, defaults._glassOpacity);
 
 	const auto embeddedType = _messageShotSettings._embeddedThemeType.current();
 	auto embeddedTypeValid = (embeddedType == -1) || (embeddedType >= 0 && embeddedType <= 3); // from Window::Theme::EmbeddedType::DayBlue to Window::Theme::EmbeddedType::NightGreen
@@ -1062,6 +1064,36 @@ void AyuSettings::setSingleCornerRadius(bool val) {
 	save();
 }
 
+void AyuSettings::setGlassEnabled(bool val) {
+	if (_glassEnabled.current() == val) return;
+	_glassEnabled = val;
+	repaintApp();
+	save();
+}
+
+void AyuSettings::setGlassBlur(int val) {
+	val = std::clamp(val, 1, 10);
+	if (_glassBlur.current() == val) return;
+	_glassBlur = val;
+	repaintApp();
+	save();
+}
+
+void AyuSettings::setGlassOpacity(int val) {
+	val = std::clamp(val, 0, 100);
+	if (_glassOpacity.current() == val) return;
+	_glassOpacity = val;
+	repaintApp();
+	save();
+}
+
+void AyuSettings::setGlassFloatingInput(bool val) {
+	if (_glassFloatingInput.current() == val) return;
+	_glassFloatingInput = val;
+	repaintApp();
+	save();
+}
+
 void AyuSettings::setStreamerMode(bool val) {
 	if (_streamerMode.current() == val) return;
 	_streamerMode = val;
@@ -1164,6 +1196,10 @@ void to_json(nlohmann::json &j, const AyuSettings &s) {
 		{"crashReporting", s._crashReporting.current()},
 		{"avatarCorners", s._avatarCorners.current()},
 		{"singleCornerRadius", s._singleCornerRadius.current()},
+		{"glassEnabled", s._glassEnabled.current()},
+		{"glassBlur", s._glassBlur.current()},
+		{"glassOpacity", s._glassOpacity.current()},
+		{"glassFloatingInput", s._glassFloatingInput.current()},
 		{"streamerMode", s._streamerMode.current()},
 		{"messageShotSettings", s._messageShotSettings}
 	};
@@ -1268,6 +1304,10 @@ void from_json(const nlohmann::json &j, AyuSettings &s) {
 	s._crashReporting = j.value("crashReporting", defaults._crashReporting.current());
 	s._avatarCorners = j.value("avatarCorners", defaults._avatarCorners.current());
 	s._singleCornerRadius = j.value("singleCornerRadius", defaults._singleCornerRadius.current());
+	s._glassEnabled = j.value("glassEnabled", defaults._glassEnabled.current());
+	s._glassBlur = j.value("glassBlur", defaults._glassBlur.current());
+	s._glassOpacity = j.value("glassOpacity", defaults._glassOpacity.current());
+	s._glassFloatingInput = j.value("glassFloatingInput", defaults._glassFloatingInput.current());
 	s._streamerMode = j.value("streamerMode", defaults._streamerMode.current());
 
 	if (j.contains("messageShotSettings") && j["messageShotSettings"].is_object()) {

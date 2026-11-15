@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "history/view/history_view_top_bar_widget.h"
 
+#include "ayu/ui/glass/glass_effect.h"
+
 #include "history/history.h"
 #include "history/view/history_view_send_action.h"
 #include "boxes/add_contact_box.h"
@@ -559,7 +561,19 @@ void TopBarWidget::paintEvent(QPaintEvent *e) {
 		: -st::topBarHeight;
 	const auto slidingTop = std::max(selectedButtonsTop, searchFieldTop);
 
-	p.fillRect(QRect(0, 0, width(), st::topBarHeight), st::topBarBg);
+	const auto bar = QRect(0, 0, width(), st::topBarHeight);
+	const auto bgWidget = parentWidget();
+	if (AyuGlass::Enabled() && bgWidget) {
+		AyuGlass::PaintChatGlass(
+			p,
+			bar,
+			_controller,
+			_controller->currentChatTheme(),
+			bgWidget,
+			mapTo(bgWidget, QPoint()));
+	} else {
+		p.fillRect(bar, st::topBarBg);
+	}
 	if (slidingTop < 0) {
 		p.translate(0, slidingTop + st::topBarHeight);
 		paintTopBar(p);

@@ -352,6 +352,10 @@ public:
 	[[nodiscard]] bool crashReporting() const { return _crashReporting.current(); }
 	[[nodiscard]] int avatarCorners() const { return _avatarCorners.current(); }
 	[[nodiscard]] bool singleCornerRadius() const { return _singleCornerRadius.current(); }
+	[[nodiscard]] bool glassEnabled() const { return _glassEnabled.current(); }
+	[[nodiscard]] int glassBlur() const { return _glassBlur.current(); }
+	[[nodiscard]] int glassOpacity() const { return _glassOpacity.current(); }
+	[[nodiscard]] bool glassFloatingInput() const { return _glassFloatingInput.current(); }
 	[[nodiscard]] bool streamerMode() const { return _streamerMode.current(); }
 
 	void setSaveDeletedMessages(bool val);
@@ -439,6 +443,10 @@ public:
 	void setCrashReporting(bool val);
 	void setAvatarCorners(int val);
 	void setSingleCornerRadius(bool val);
+	void setGlassEnabled(bool val);
+	void setGlassBlur(int val);
+	void setGlassOpacity(int val);
+	void setGlassFloatingInput(bool val);
 	void setStreamerMode(bool val);
 
 	[[nodiscard]] rpl::producer<bool> useGlobalGhostModeValue() const { return _useGlobalGhostMode.value(); }
@@ -613,6 +621,7 @@ public:
 	[[nodiscard]] rpl::producer<int> avatarCornersChanges() const { return _avatarCorners.changes(); }
 	[[nodiscard]] rpl::producer<bool> singleCornerRadiusValue() const { return _singleCornerRadius.value(); }
 	[[nodiscard]] rpl::producer<bool> singleCornerRadiusChanges() const { return _singleCornerRadius.changes(); }
+	[[nodiscard]] rpl::producer<bool> glassEnabledValue() const { return _glassEnabled.value(); }
 	[[nodiscard]] rpl::producer<bool> streamerModeValue() const { return _streamerMode.value(); }
 	[[nodiscard]] rpl::producer<bool> streamerModeChanges() const { return _streamerMode.changes(); }
 
@@ -710,6 +719,10 @@ private:
 	rpl::variable<bool> _crashReporting = true;
 	rpl::variable<int> _avatarCorners = 23;
 	rpl::variable<bool> _singleCornerRadius = false;
+	rpl::variable<bool> _glassEnabled = true;
+	rpl::variable<int> _glassBlur = 6;
+	rpl::variable<int> _glassOpacity = 45;
+	rpl::variable<bool> _glassFloatingInput = true;
 	rpl::variable<bool> _streamerMode = false;
 
 	rpl::variable<bool> _useGlobalGhostMode = true;
